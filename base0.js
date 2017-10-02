@@ -73,6 +73,7 @@ class Base0 {
 
   addFac (type, name, ns, label, opts, cb) {
     opts.label = label
+    opts.root = this.ctx.root
 
     const fac = this.facility(type, name, ns, opts)
 
