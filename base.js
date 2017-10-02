@@ -17,7 +17,7 @@ class Base0 {
 
     this.conf.init = {
       facilities: [
-        ['fac', 'intervals', '0', '0', {}]
+        ['fac', 'intervals', '0', '0', {}, -10]
       ]
     }
 
@@ -71,9 +71,13 @@ class Base0 {
     return _.camelCase(_.uniq(_.snakeCase(name).split('_')))
   }
 
-  addFac (type, name, ns, label, opts, cb) {
+  addFac (type, name, ns, label, opts, prio, cb) {
     opts.label = label
     opts.root = this.ctx.root
+
+    if (_.isFunction(opts)) {
+      opts = opts()
+    }
 
     const fac = this.facility(type, name, ns, opts)
 
@@ -96,6 +100,8 @@ class Base0 {
     const aseries = []
 
     _.each(list, p => {
+      if (!p[5]) p[5] = 1
+    
       aseries.push(next => {
         this[dir].apply(this, p.concat([next]))
       })
@@ -107,7 +113,7 @@ class Base0 {
   loadStatus () {
     try {
       const status = JSON.parse(fs.readFileSync(
-        `${__dirname}/../status/${this.prefix}.json`, 'UTF-8')
+        `${this.ctx.root}/status/${this.prefix}.json`, 'UTF-8')
       )
       _.extend(this.status, _.isObject(status) ? status : {})
     } catch (e) {}
@@ -115,7 +121,7 @@ class Base0 {
 
   saveStatus () {
     try {
-      fs.writeFile(`${__dirname}/../status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
+      fs.writeFile(`${this.ctx.root}/status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
     } catch (e) {
       console.error(e)
     }
@@ -125,7 +131,11 @@ class Base0 {
     const aseries = []
 
     aseries.push(next => {
-      this.facs('addFac', this.conf.init.facilities, (err) => {
+      const facs = _.orderBy(this.conf.init.facilities, f => {
+        return f[5] || 1
+      })
+      
+      this.facs('addFac', facs, (err) => {
         // crash early to avoid silent fails in facilities
         if (err) {
           console.trace()
@@ -162,7 +172,11 @@ class Base0 {
     })
 
     aseries.push(next => {
-      this.facs('delFac', _.map(this.conf.init.facilities, f => {
+      const facs = _.orderBy(this.conf.init.facilities, f => {
+        return (f[5] || 1) * -1
+      })
+      
+      this.facs('delFac', _.map(facs, f => {
         return [f[1], f[3]]
       }), next)
     })
