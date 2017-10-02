@@ -3,7 +3,6 @@
 const fs = require('fs')
 const _ = require('lodash')
 const async = require('async')
-const lutils = require('./../utils.js')
 
 class Base0 {
   constructor (conf, ctx) {
@@ -27,10 +26,27 @@ class Base0 {
     this.loadStatus()
   }
 
+  getConf (env, type, path) {
+    const conf = JSON.parse(fs.readFileSync(path, 'utf8'))
+    if (!_.isObject(conf)) {
+      return {}
+    }
+
+    let res = {}
+
+    if (type) {
+      _.set(res, type, conf[env] ? conf[env] : conf)
+    } else {
+      res = conf
+    }
+
+    return res
+  }
+
   loadConf (c, n = null) {
     _.merge(
       this.conf,
-      lutils.get_conf_json(this.ctx.env, n, `${__dirname}/../config/${c}.json`)
+      this.getConf(this.ctx.env, n, `${this.ctx.root}/config/${c}.json`)
     )
   }
 
@@ -39,7 +55,7 @@ class Base0 {
     let rdir = 'facilities'
 
     try {
-      Fmod = require(`${__dirname}/../${rdir}/${name}.js`)
+      Fmod = require(`${this.ctx.root}/${rdir}/${name}.js`)
     } catch (e) {
       console.log(e)
     }
