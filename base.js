@@ -4,7 +4,7 @@ const fs = require('fs')
 const _ = require('lodash')
 const async = require('async')
 
-class Base0 {
+class Base {
   constructor (conf, ctx) {
     this.conf = conf
     this.ctx = ctx
@@ -201,4 +201,4 @@ class Base0 {
   }
 }
 
-module.exports = Base0
+module.exports = Base
