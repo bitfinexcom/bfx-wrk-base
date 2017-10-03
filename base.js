@@ -16,14 +16,16 @@ class Base {
     this.status = {}
 
     this.conf.init = {
-      facilities: [
-        ['fac', 'intervals', '0', '0', {}, -10]
-      ]
+      facilities: []
     }
 
     this.mem = {}
 
     this.loadStatus()
+
+    this.setInitFacs([
+      ['fac', 'intervals', '0', '0', {}, -10]
+    ])
   }
 
   getConf (env, type, path) {
@@ -71,7 +73,12 @@ class Base {
     return _.camelCase(_.uniq(_.snakeCase(name).split('_')))
   }
 
-  addFac (type, name, ns, label, opts, prio, cb) {
+  addFac (type, name, ns, label, opts, prio = 0, cb) {
+    const fns = `${this.nameFac(name)}_${label}`
+    if (this[fns]) {
+      return cb(new Error(`ERR_FACILITY_DUP`))
+    }
+
     if (_.isFunction(opts)) {
       opts = opts()
     }
@@ -81,7 +88,6 @@ class Base {
 
     const fac = this.facility(type, name, ns, opts)
 
-    const fns = `${this.nameFac(name)}_${label}`
     this[fns] = fac
     fac.start(cb)
   }
@@ -110,6 +116,12 @@ class Base {
     async.series(aseries, cb)
   }
 
+  setInitFacs (facs) {
+    this.conf.init.facilities.push.apply(
+      this.conf.init.facilities, facs
+    )
+  }
+
   loadStatus () {
     try {
       const status = JSON.parse(fs.readFileSync(
@@ -121,7 +133,10 @@ class Base {
 
   saveStatus () {
     try {
-      fs.writeFile(`${this.ctx.root}/status/${this.prefix}.json`, JSON.stringify(this.status), () => {})
+      fs.writeFile(
+        `${this.ctx.root}/status/${this.prefix}.json`,
+        JSON.stringify(this.status), () => {}
+      )
     } catch (e) {
       console.error(e)
     }
@@ -131,10 +146,11 @@ class Base {
     const aseries = []
 
     aseries.push(next => {
-      const facs = _.orderBy(this.conf.init.facilities, f => {
-        return f[5] || 1
+      let facs = this.conf.init.facilities
+      facs = _.orderBy(facs, f => {
+        return f[5] || 0
       })
-      
+
       this.facs('addFac', facs, (err) => {
         // crash early to avoid silent fails in facilities
         if (err) {
@@ -172,10 +188,11 @@ class Base {
     })
 
     aseries.push(next => {
-      const facs = _.orderBy(this.conf.init.facilities, f => {
-        return (f[5] || 1) * -1
+      let facs = this.conf.init.facilities
+      facs = _.orderBy(facs, f => {
+        return (f[5] || 0) * -1
       })
-      
+
       this.facs('delFac', _.map(facs, f => {
         return [f[1], f[3]]
       }), next)
