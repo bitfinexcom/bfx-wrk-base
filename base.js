@@ -82,7 +82,7 @@ class Base {
     if (_.isFunction(opts)) {
       opts = opts()
     }
-    
+
     opts.label = label
     opts.root = this.ctx.root
 
@@ -107,7 +107,7 @@ class Base {
 
     _.each(list, p => {
       if (!p[5]) p[5] = 1
-    
+
       aseries.push(next => {
         this[dir].apply(this, p.concat([next]))
       })
