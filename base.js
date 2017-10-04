@@ -53,11 +53,18 @@ class Base {
   }
 
   facility (type, name, ns, opts) {
-    let Fmod = null
-    let rdir = 'facilities'
+    let [Fmod, path] = [null, null]
+
+    if (name.indexOf('bfx-facs-') === 0) {
+      path = `${name}`
+      name = name.replace('bfx-facs-', '')
+    } else {
+      let rdir = 'facilities'
+      path = `${this.ctx.root}/${rdir}/${name}.js`
+    }
 
     try {
-      Fmod = require(`${this.ctx.root}/${rdir}/${name}.js`)
+      Fmod = require(path)
     } catch (e) {
       console.log(e)
     }
