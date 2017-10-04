@@ -73,7 +73,10 @@ class Base {
       return null
     }
 
-    return (new Fmod(this, _.extend({ ns: ns }, opts), _.pick(this.ctx, ['env'])))
+    const fac = (new Fmod(this, _.extend({ ns: ns }, opts), _.pick(this.ctx, ['env'])))
+    fac.__name = name
+
+    return fac
   }
 
   nameFac (name) {
@@ -81,11 +84,6 @@ class Base {
   }
 
   addFac (type, name, ns, label, opts, prio = 0, cb) {
-    const fns = `${this.nameFac(name)}_${label}`
-    if (this[fns]) {
-      return cb(new Error(`ERR_FACILITY_DUP`))
-    }
-
     if (_.isFunction(opts)) {
       opts = opts()
     }
@@ -94,6 +92,9 @@ class Base {
     opts.root = this.ctx.root
 
     const fac = this.facility(type, name, ns, opts)
+    name = fac.__name
+
+    const fns = `${this.nameFac(name)}_${label}`
 
     this[fns] = fac
     fac.start(cb)
