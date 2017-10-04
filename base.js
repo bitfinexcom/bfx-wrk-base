@@ -56,7 +56,7 @@ class Base {
     let [Fmod, path] = [null, null]
 
     if (name.indexOf('bfx-facs-') === 0) {
-      path = `${name}`
+      path = name
       name = name.replace('bfx-facs-', '')
     } else {
       let rdir = 'facilities'
