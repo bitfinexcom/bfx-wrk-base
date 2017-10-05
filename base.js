@@ -92,6 +92,10 @@ class Base {
     opts.root = this.ctx.root
 
     const fac = this.facility(type, name, ns, opts)
+    if (!fac) {
+      return cb(new Error('ERR_FAC_LOAD'))
+    }
+
     name = fac.__name
 
     const fns = `${this.nameFac(name)}_${label}`
