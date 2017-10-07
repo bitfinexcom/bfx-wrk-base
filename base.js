@@ -52,12 +52,16 @@ class Base {
     )
   }
 
+  cleanFacName (name) {
+    return name.replace('bfx-facs-', '')
+  }
+
   facility (type, name, ns, opts) {
     let [Fmod, path] = [null, null]
 
     if (name.indexOf('bfx-facs-') === 0) {
       path = name
-      name = name.replace('bfx-facs-', '')
+      name = this.cleanFacName(name)
     } else {
       let rdir = 'facilities'
       path = `${this.ctx.root}/${rdir}/${name}.js`
@@ -79,8 +83,8 @@ class Base {
     return fac
   }
 
-  nameFac (name) {
-    return _.camelCase(_.uniq(_.snakeCase(name).split('_')))
+  getFacNs (name, label) {
+    return `${_.camelCase(name)}_${label}`
   }
 
   addFac (type, name, ns, label, opts, prio = 0, cb) {
@@ -97,15 +101,18 @@ class Base {
     }
 
     name = fac.__name
-
-    const fns = `${this.nameFac(name)}_${label}`
+    const fns = this.getFacNs(name, label)
+    if (this[fns]) {
+      throw new Error(`Namespace conflict: fns ${fns}`)
+    }
 
     this[fns] = fac
     fac.start(cb)
   }
 
-  delFac (name, label, cb) {
-    const fns = `${this.nameFac(name)}_${label}`
+  delFac (type, name, ns, label, opts, prio = 0, cb) {
+    name = this.cleanFacName(name)
+    const fns = this.getFacNs(name, label)
     const fac = this[fns]
 
     if (!fac) return cb()
