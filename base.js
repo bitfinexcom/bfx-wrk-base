@@ -24,7 +24,7 @@ class Base {
     this.loadStatus()
 
     this.setInitFacs([
-      ['fac', 'intervals', '0', '0', {}, -10]
+      ['fac', 'bfx-facs-interval', '0', '0', {}, -10]
     ])
   }
 
