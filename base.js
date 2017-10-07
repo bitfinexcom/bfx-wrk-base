@@ -205,9 +205,7 @@ class Base {
         return (f[5] || 0) * -1
       })
 
-      this.facs('delFac', _.map(facs, f => {
-        return [f[1], f[3]]
-      }), next)
+      this.facs('delFac', facs, next)
     })
 
     aseries.push(next => {
