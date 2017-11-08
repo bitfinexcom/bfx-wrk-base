@@ -16,7 +16,8 @@ class Base {
     this.status = {}
 
     this.conf.init = {
-      facilities: []
+      facilities: [],
+      services: []
     }
 
     this.mem = {}
@@ -50,6 +51,20 @@ class Base {
       this.conf,
       this.getConf(this.ctx.env, n, `${this.ctx.root}/config/${c}.json`)
     )
+
+    this.nConf = n
+  }
+
+  getServices () {
+    if (this.conf[this.nConf] && this.conf[this.nConf].services) {
+      return this.conf[this.nConf].services
+    }
+
+    if (Array.isArray(this.conf.services)) {
+      return this.conf.services
+    }
+
+    return []
   }
 
   cleanFacName (name) {
