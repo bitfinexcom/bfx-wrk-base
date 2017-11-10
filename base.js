@@ -45,11 +45,14 @@ class Base {
     return res
   }
 
-  loadConf (c, n = null) {
+  loadConf (c, group = null) {
     _.merge(
       this.conf,
-      this.getConf(this.ctx.env, n, `${this.ctx.root}/config/${c}.json`)
+      this.getConf(this.ctx.env, group, `${this.ctx.root}/config/${c}.json`)
     )
+
+    // e.g. util, coin or ext (i.e. derived from bfx-util-js)
+    this.group = group
   }
 
   cleanFacName (name) {
