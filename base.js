@@ -66,8 +66,11 @@ class Base {
       path = name
       name = this.cleanFacName(name)
     } else {
-      let rdir = 'facilities'
-      path = `${this.ctx.root}/${rdir}/${name}.js`
+      const rdir = `${this.ctx.root}/facilities`
+      if (fs.existsSync(`${rdir}/${name}/index.js`))
+        path = `${rdir}/${name}/index.js`
+      else
+        path = `${rdir}/${name}.js`
     }
 
     try {
