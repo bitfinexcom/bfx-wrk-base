@@ -210,7 +210,7 @@ class Base {
     aseries.push(next => {
 
       let itv = setInterval(() => {
-        if (this._lockProcessing) {
+        if (this.lockProcessing) {
           return
         }
         clearInterval(itv)
