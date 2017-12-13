@@ -206,6 +206,16 @@ class Base {
     const aseries = []
 
     aseries.push(next => {
+      let itv = setInterval(() => {
+        if (this._lockProcessing) {
+          return
+        }
+        clearInterval(itv)
+        next()
+      }, 250)
+    })
+
+    aseries.push(next => {
       this._stop(next)
     })
 
