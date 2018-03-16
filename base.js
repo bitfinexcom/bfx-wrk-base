@@ -91,6 +91,10 @@ class Base {
   }
 
   addFac (type, name, ns, label, opts, prio = 0, cb) {
+    if (_.isFunction(ns)) {
+      ns = ns(name, ns, label)
+    }
+
     if (_.isFunction(opts)) {
       opts = opts()
     }
