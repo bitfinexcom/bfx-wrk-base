@@ -3,9 +3,12 @@
 const fs = require('fs')
 const _ = require('lodash')
 const async = require('async')
+const EventEmitter = require('events')
 
-class Base {
+class Base extends EventEmitter {
   constructor (conf, ctx) {
+    super()
+
     this.conf = conf
     this.ctx = ctx
     this.wtype = ctx.wtype
@@ -168,7 +171,7 @@ class Base {
     }
   }
 
-  start (cb) {
+  start (cb = () => {}) {
     const aseries = []
 
     aseries.push(next => {
@@ -200,7 +203,13 @@ class Base {
       this._start(next)
     })
 
-    async.series(aseries, cb)
+    async.series(aseries, (err) => {
+      if (err) return cb(err)
+
+      process.nextTick(() => {
+        this.emit('started')
+      })
+    })
   }
 
   _start0 (cb) { cb() }
