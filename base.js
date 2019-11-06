@@ -69,7 +69,7 @@ class Base extends EventEmitter {
       path = name
       name = this.cleanFacName(name)
     } else {
-      let rdir = 'facilities'
+      const rdir = 'facilities'
       path = `${this.ctx.root}/${rdir}/${name}.js`
     }
 
@@ -161,12 +161,21 @@ class Base extends EventEmitter {
   }
 
   saveStatus () {
+    const dir = `${this.ctx.root}/status`
+
     try {
-      fs.writeFile(
-        `${this.ctx.root}/status/${this.prefix}.json`,
-        JSON.stringify(this.status), () => {}
+      fs.writeFileSync(
+        `${dir}/${this.prefix}.json`,
+        JSON.stringify(this.status)
       )
     } catch (e) {
+      if (e.code === 'ENOENT') {
+        fs.mkdirSync(dir)
+        console.log(`saveStatus(): no status directory found. created status directory ${dir}`)
+        this.saveStatus()
+        return
+      }
+
       console.error(e)
     }
   }
@@ -221,8 +230,7 @@ class Base extends EventEmitter {
     const aseries = []
 
     aseries.push(next => {
-
-      let itv = setInterval(() => {
+      const itv = setInterval(() => {
         if (this.lockProcessing) {
           return
         }
