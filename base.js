@@ -69,7 +69,7 @@ class Base extends EventEmitter {
       path = name
       name = this.cleanFacName(name)
     } else {
-      let rdir = 'facilities'
+      const rdir = 'facilities'
       path = `${this.ctx.root}/${rdir}/${name}.js`
     }
 
@@ -221,8 +221,7 @@ class Base extends EventEmitter {
     const aseries = []
 
     aseries.push(next => {
-
-      let itv = setInterval(() => {
+      const itv = setInterval(() => {
         if (this.lockProcessing) {
           return
         }
