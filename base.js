@@ -1,6 +1,7 @@
 'use strict'
 
 const fs = require('fs')
+const { join } = require('path')
 const _ = require('lodash')
 const async = require('async')
 const EventEmitter = require('events')
@@ -49,10 +50,16 @@ class Base extends EventEmitter {
   }
 
   loadConf (c, group = null) {
-    _.merge(
-      this.conf,
-      this.getConf(this.ctx.env, group, `${this.ctx.root}/config/${c}.json`)
-    )
+    const fprefix = this.ctx.env === 'test' ? 'test' : ''
+    const dirname = join(this.ctx.root, 'config')
+
+    let confpath = join(dirname, `${c}.json`)
+    const testpath = join(dirname, `${fprefix}.${c}.json`)
+    if (fprefix && fs.existsSync(testpath)) {
+      confpath = testpath
+    }
+
+    _.merge(this.conf, this.getConf(this.ctx.env, group, confpath))
 
     // e.g. util, coin or ext (i.e. derived from bfx-util-js)
     this.group = group
