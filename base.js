@@ -50,7 +50,7 @@ class Base extends EventEmitter {
   }
 
   loadConf (c, group = null) {
-    const fprefix = this.ctx.env === 'test' ? 'test' : ''
+    const fprefix = this.ctx.env
     const dirname = join(this.ctx.root, 'config')
 
     let confpath = join(dirname, `${c}.json`)
