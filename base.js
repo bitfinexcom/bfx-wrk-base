@@ -53,13 +53,13 @@ class Base extends EventEmitter {
     const fprefix = this.ctx.env
     const dirname = join(this.ctx.root, 'config')
 
-    let confpath = join(dirname, `${c}.json`)
-    const testpath = join(dirname, `${fprefix}.${c}.json`)
-    if (fprefix && fs.existsSync(testpath)) {
-      confpath = testpath
+    let confPath = join(dirname, `${c}.json`)
+    const envConfPath = join(dirname, `${fprefix}.${c}.json`)
+    if (fprefix && fs.existsSync(envConfPath)) {
+      confPath = envConfPath
     }
 
-    _.merge(this.conf, this.getConf(this.ctx.env, group, confpath))
+    _.merge(this.conf, this.getConf(this.ctx.env, group, confPath))
 
     // e.g. util, coin or ext (i.e. derived from bfx-util-js)
     this.group = group
