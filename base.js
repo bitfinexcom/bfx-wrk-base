@@ -1,11 +1,15 @@
 'use strict'
 
 const fs = require('fs')
+const { join } = require('path')
 const _ = require('lodash')
 const async = require('async')
+const EventEmitter = require('events')
 
-class Base {
+class Base extends EventEmitter {
   constructor (conf, ctx) {
+    super()
+
     this.conf = conf
     this.ctx = ctx
     this.wtype = ctx.wtype
@@ -52,10 +56,16 @@ class Base {
   }
 
   loadConf (c, group = null) {
-    _.merge(
-      this.conf,
-      this.getConf(this.ctx.env, group, `${this.ctx.root}/config/${c}.json`)
-    )
+    const fprefix = this.ctx.env
+    const dirname = join(this.ctx.root, 'config')
+
+    let confPath = join(dirname, `${c}.json`)
+    const envConfPath = join(dirname, `${fprefix}.${c}.json`)
+    if (fprefix && fs.existsSync(envConfPath)) {
+      confPath = envConfPath
+    }
+
+    _.merge(this.conf, this.getConf(this.ctx.env, group, confPath))
 
     // e.g. util, coin or ext (i.e. derived from bfx-util-js)
     this.group = group
@@ -72,7 +82,7 @@ class Base {
       path = name
       name = this.cleanFacName(name)
     } else {
-      let rdir = 'facilities'
+      const rdir = 'facilities'
       path = `${this.ctx.root}/${rdir}/${name}.js`
     }
 
@@ -164,17 +174,26 @@ class Base {
   }
 
   saveStatus () {
+    const dir = `${this.ctx.root}/status`
+
     try {
-      fs.writeFile(
-        `${this.ctx.root}/status/${this.prefix}.json`,
-        JSON.stringify(this.status), () => {}
+      fs.writeFileSync(
+        `${dir}/${this.prefix}.json`,
+        JSON.stringify(this.status)
       )
     } catch (e) {
+      if (e.code === 'ENOENT') {
+        fs.mkdirSync(dir)
+        console.log(`saveStatus(): no status directory found. created status directory ${dir}`)
+        this.saveStatus()
+        return
+      }
+
       console.error(e)
     }
   }
 
-  start (cb) {
+  start (cb = () => {}) {
     const aseries = []
 
     aseries.push(next => {
@@ -206,7 +225,13 @@ class Base {
       this._start(next)
     })
 
-    async.series(aseries, cb)
+    async.series(aseries, (err) => {
+      if (err) return cb(err)
+
+      process.nextTick(() => {
+        this.emit('started')
+      })
+    })
   }
 
   _start0 (cb) { cb() }
@@ -218,8 +243,7 @@ class Base {
     const aseries = []
 
     aseries.push(next => {
-
-      let itv = setInterval(() => {
+      const itv = setInterval(() => {
         if (this.lockProcessing) {
           return
         }
