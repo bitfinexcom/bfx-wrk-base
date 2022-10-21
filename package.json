@@ -30,5 +30,19 @@
       "name": "prdn",
       "email": "paolo@bitfinex.com"
     }
-  ]
+  ],
+  "devDependencies": {
+    "mocha": "^10.1.0",
+    "standard": "16.0.0",
+    "sinon": "^14.0.1"
+  },
+  "scripts": {
+    "test": "mocha ./test --exit",
+    "lint": "standard"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
+  }
 }
