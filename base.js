@@ -65,7 +65,29 @@ class Base extends EventEmitter {
       confPath = envConfPath
     }
 
-    _.merge(this.conf, this.getConf(this.ctx.env, group, confPath))
+    const exampleConfigPath = `${confPath}.example`
+    const config = this.getConf(this.ctx.env, group, confPath)
+
+    // console.log('example cfg path:> ', `${confPath}.example`)
+    if (fs.existsSync(exampleConfigPath)) {
+      const exampleConfig = this.getConf(this.ctx.env, group, exampleConfigPath)
+
+      const srcCfgKeys = _.keys(_.get(exampleConfig, group, exampleConfig))
+      const destCfgKeys = _.keys(_.get(config, group, config))
+      const missingKeys = _.difference(srcCfgKeys, destCfgKeys)
+
+      if (missingKeys.length) {
+        console.log(`
+          CONFIG MISSING KEY/VALUE FROM CONFIG.EXAMPLE
+          ============================================
+          [${missingKeys}] missing in ${confPath}
+          ============================================
+        `)
+        process.exit(1)
+      }
+    }
+
+    _.merge(this.conf, config)
 
     // e.g. util, coin or ext (i.e. derived from bfx-util-js)
     this.group = group
