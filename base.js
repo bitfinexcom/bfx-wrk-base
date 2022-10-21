@@ -68,7 +68,6 @@ class Base extends EventEmitter {
     const exampleConfigPath = `${confPath}.example`
     const config = this.getConf(this.ctx.env, group, confPath)
 
-    // console.log('example cfg path:> ', `${confPath}.example`)
     if (fs.existsSync(exampleConfigPath)) {
       const exampleConfig = this.getConf(this.ctx.env, group, exampleConfigPath)
 
