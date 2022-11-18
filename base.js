@@ -9,7 +9,7 @@ const EventEmitter = require('events')
 const extractObjectKeys = (obj, keys = []) => {
   for (let key in obj) {
     keys.push(key)
-    if (_.isObject(obj[key])) {
+    if (_.isObject(obj[key]) && !_.isArray(obj[key])) {
       extractObjectKeys(obj[key], keys)
     }
   }
