@@ -32,4 +32,4 @@ this.loadConf("cosmos.coin", "coin", {
 
 Keys of this validation object are used to access config values using lodash `_.get` so you can
 chain access pattern as in example above `some.nested.value`. You can specify here if the value is
-`required: true` and if value is equal to corresponding value from `.example` file `sameAsExample: true`.
+`required: true` and if value should be equal to corresponding value from `.example` file `sameAsExample: true`.
