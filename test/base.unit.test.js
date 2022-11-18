@@ -18,8 +18,7 @@ describe('loadConf', () => {
   it('should exit when config keys do not match example config keys', () => {
     const workerBase = new WrkBase({}, { root: __dirname })
     workerBase.loadConf('missing-keys.coin', 'coin')
-    assert.ok(process.exit.called)
-    assert.ok(process.exit.calledWith(1))
+    assert.ok(process.exit.calledOnceWithExactly(1))
   })
 
   it('should exit when config keys do not match example nested config keys', () => {
