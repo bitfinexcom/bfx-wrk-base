@@ -77,7 +77,7 @@ class Base extends EventEmitter {
     return res
   }
 
-  loadConf (c, group = null, valueCheck = null) {
+  loadConf (c, group = null, validation = null) {
     const fprefix = this.ctx.env
     const dirname = join(this.ctx.root, 'config')
 
@@ -105,9 +105,9 @@ class Base extends EventEmitter {
         process.exit(1)
       }
 
-      if (valueCheck) {
-        for (let key in valueCheck) {
-          const check = valueCheck[key]
+      if (validation) {
+        for (let key in validation) {
+          const check = validation[key]
           if (check.required && !_.get(groupedCfg, key)) {
             printOutput('CONFIG MISSING MANDATORY VALUE', `['${key}'] missing value`)
             process.exit(1)
