@@ -1,0 +1,14 @@
+{
+  "provider": "http://127.0.0.1:8080",
+  "currency": "TEST",
+  "symbol": "TEST",
+  "decimals": 8,
+  "sweepKeep": 0.001,
+  "root": {
+    "lvl2": {
+      "lvl3": {
+        "value": [1, 2, 3]
+      }
+    }
+  }
+}

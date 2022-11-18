@@ -6,6 +6,28 @@ const _ = require('lodash')
 const async = require('async')
 const EventEmitter = require('events')
 
+const extractKeys = (obj, keys = []) => {
+  for (let key in obj) {
+    keys.push(key)
+    if (_.isObject(obj[key])) {
+      extractKeys(obj[key], keys)
+    }
+  }
+  return keys;
+}
+
+const printOutput = (title, content) => {
+  console.log(`
+    ###############################################
+    # ${title}
+    ###############################################
+    #
+    # ${content}
+    #
+    ###############################################
+  `)
+}
+
 class Base extends EventEmitter {
   constructor (conf, ctx) {
     super()
@@ -55,7 +77,7 @@ class Base extends EventEmitter {
     return res
   }
 
-  loadConf (c, group = null) {
+  loadConf (c, group = null, valueCheck = null) {
     const fprefix = this.ctx.env
     const dirname = join(this.ctx.root, 'config')
 
@@ -70,19 +92,37 @@ class Base extends EventEmitter {
 
     if (fs.existsSync(exampleConfigPath)) {
       const exampleConfig = this.getConf(this.ctx.env, group, exampleConfigPath)
+      const groupedExampleCfg = _.get(exampleConfig, group, exampleConfig)
+      const srcCfgKeys = extractKeys(groupedExampleCfg)
 
-      const srcCfgKeys = _.keys(_.get(exampleConfig, group, exampleConfig))
-      const destCfgKeys = _.keys(_.get(config, group, config))
+      const groupedCfg = _.get(config, group, config)
+      const destCfgKeys = extractKeys(groupedCfg)
+
       const missingKeys = _.difference(srcCfgKeys, destCfgKeys)
 
       if (missingKeys.length) {
-        console.log(`
-          CONFIG MISSING KEY/VALUE FROM CONFIG.EXAMPLE
-          ============================================
-          [${missingKeys}] missing in ${confPath}
-          ============================================
-        `)
+        printOutput('CONFIG MISSING KEY/VALUE FROM CONFIG.EXAMPLE', `[${missingKeys}] missing in ${confPath}`)
         process.exit(1)
+      }
+
+      if (valueCheck) {
+        for (let key in valueCheck) {
+          const check = valueCheck[key]
+          if (check.required && !_.get(groupedCfg, key)) {
+            printOutput('CONFIG MISSING MANDATORY VALUE', `['${key}'] missing value`)
+            process.exit(1)
+          }
+
+          if (check.sameAsExample) {
+            const cfgValue = _.get(groupedCfg, key)
+            const exampleCfgValue = _.get(groupedExampleCfg, key)
+
+            if (!_.isEqual(cfgValue, exampleCfgValue)) {
+              printOutput('CONFIG VALUE MISMATCH', `config['${key}']:[${cfgValue}] !== exampleConfig['${key}']:[${exampleCfgValue}]`)
+              process.exit(1)
+            }
+          }
+        }
       }
     }
 

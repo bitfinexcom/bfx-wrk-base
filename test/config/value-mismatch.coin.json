@@ -3,5 +3,5 @@
   "currency": "TEST",
   "symbol": "TEST",
   "decimals": 8,
-  "sweepKeep": 0.01
+  "sweepKeep": 1000
 }
