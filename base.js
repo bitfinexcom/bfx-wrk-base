@@ -6,11 +6,11 @@ const _ = require('lodash')
 const async = require('async')
 const EventEmitter = require('events')
 
-const extractKeys = (obj, keys = []) => {
+const extractObjectKeys = (obj, keys = []) => {
   for (let key in obj) {
     keys.push(key)
     if (_.isObject(obj[key])) {
-      extractKeys(obj[key], keys)
+      extractObjectKeys(obj[key], keys)
     }
   }
   return keys;
@@ -93,10 +93,10 @@ class Base extends EventEmitter {
     if (fs.existsSync(exampleConfigPath)) {
       const exampleConfig = this.getConf(this.ctx.env, group, exampleConfigPath)
       const groupedExampleCfg = _.get(exampleConfig, group, exampleConfig)
-      const srcCfgKeys = extractKeys(groupedExampleCfg)
+      const srcCfgKeys = extractObjectKeys(groupedExampleCfg)
 
       const groupedCfg = _.get(config, group, config)
-      const destCfgKeys = extractKeys(groupedCfg)
+      const destCfgKeys = extractObjectKeys(groupedCfg)
 
       const missingKeys = _.difference(srcCfgKeys, destCfgKeys)
 
