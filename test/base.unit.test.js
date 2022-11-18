@@ -29,13 +29,13 @@ describe('loadConf', () => {
 
   it('should exit if required value is missing', () => {
     const workerBase = new WrkBase({}, { root: __dirname })
-    workerBase.loadConf('missing-values.coin', 'coin', { 'symbol': { required: true } })
+    workerBase.loadConf('missing-values.coin', 'coin', { symbol: { required: true } })
     assert.ok(process.exit.calledOnceWithExactly(1))
   })
 
   it('should exit if cfg value not equal example value', () => {
     const workerBase = new WrkBase({}, { root: __dirname })
-    workerBase.loadConf('value-mismatch.coin', 'coin', { 'sweepKeep': { sameAsExample: true } })
+    workerBase.loadConf('value-mismatch.coin', 'coin', { sweepKeep: { sameAsExample: true } })
     assert.ok(process.exit.calledOnceWithExactly(1))
   })
 
@@ -47,7 +47,10 @@ describe('loadConf', () => {
 
   it('should not exit when config keys match example config keys', () => {
     const workerBase = new WrkBase({}, { root: __dirname })
-    workerBase.loadConf('valid.coin', 'coin', { 'root.lvl2.lvl3.value': { sameAsExample: true, required: true } })
+    workerBase.loadConf('valid.coin', 'coin', {
+      'root.lvl2.lvl3.value': { sameAsExample: true, required: true },
+      fee: { required: true }
+    })
     assert.equal(process.exit.called, false)
     assert.equal(process.exit.calledWith(1), false)
   })
