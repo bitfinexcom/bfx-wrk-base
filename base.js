@@ -106,7 +106,7 @@ class Base extends EventEmitter {
       }
 
       if (validation) {
-        for (let key in validation) {
+        for (const key in validation) {
           const check = validation[key]
           if (check.required && !_.get(groupedCfg, key)) {
             printOutput('CONFIG MISSING MANDATORY VALUE', `['${key}'] missing value`)
