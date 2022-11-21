@@ -3,8 +3,9 @@
 /* eslint-env mocha */
 
 const assert = require('assert')
-const WrkBase = require('../base')
 const sinon = require('sinon')
+const WrkBase = require('../base')
+const validConf = require('./config/valid.coin')
 
 describe('loadConf', () => {
   beforeEach(() => {
@@ -51,7 +52,9 @@ describe('loadConf', () => {
       'root.lvl2.lvl3.value': { sameAsExample: true, required: true },
       fee: { required: true }
     })
+
     assert.equal(process.exit.called, false)
     assert.equal(process.exit.calledWith(1), false)
+    assert.deepStrictEqual(workerBase.conf.coin, validConf)
   })
 })
