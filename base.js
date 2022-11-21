@@ -6,6 +6,28 @@ const _ = require('lodash')
 const async = require('async')
 const EventEmitter = require('events')
 
+const extractObjectKeys = (obj, keys = []) => {
+  for (const key in obj) {
+    keys.push(key)
+    if (_.isObject(obj[key]) && !_.isArray(obj[key])) {
+      extractObjectKeys(obj[key], keys)
+    }
+  }
+  return keys
+}
+
+const printOutput = (title, content) => {
+  console.log(`
+    ###############################################
+    # ${title}
+    ###############################################
+    #
+    # ${content}
+    #
+    ###############################################
+  `)
+}
+
 class Base extends EventEmitter {
   constructor (conf, ctx) {
     super()
@@ -19,7 +41,7 @@ class Base extends EventEmitter {
   init () {
     if (this.conf) {
       if (this.conf.skipCertCheck) {
-        process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
       }
     }
 
@@ -55,7 +77,7 @@ class Base extends EventEmitter {
     return res
   }
 
-  loadConf (c, group = null) {
+  loadConf (c, group = null, validation = null) {
     const fprefix = this.ctx.env
     const dirname = join(this.ctx.root, 'config')
 
@@ -65,7 +87,49 @@ class Base extends EventEmitter {
       confPath = envConfPath
     }
 
-    _.merge(this.conf, this.getConf(this.ctx.env, group, confPath))
+    const exampleConfigPath = `${confPath}.example`
+    const config = this.getConf(this.ctx.env, group, confPath)
+
+    if (fs.existsSync(exampleConfigPath)) {
+      const exampleConfig = this.getConf(this.ctx.env, group, exampleConfigPath)
+      const groupedExampleCfg = _.get(exampleConfig, group, exampleConfig)
+      const srcCfgKeys = extractObjectKeys(groupedExampleCfg)
+
+      const groupedCfg = _.get(config, group, config)
+      const destCfgKeys = extractObjectKeys(groupedCfg)
+
+      const missingKeys = _.difference(srcCfgKeys, destCfgKeys)
+
+      if (missingKeys.length) {
+        printOutput('CONFIG MISSING KEY/VALUE FROM CONFIG.EXAMPLE', `[${missingKeys}] missing in ${confPath}`)
+        process.exit(1)
+      }
+
+      if (validation) {
+        for (const key in validation) {
+          const check = validation[key]
+          if (check.required) {
+            const val = _.get(groupedCfg, key)
+            if (_.isNil(val) || (_.isString(val) && _.isEmpty(val))) {
+              printOutput('CONFIG MISSING MANDATORY VALUE', `['${key}'] missing value`)
+              process.exit(1)
+            }
+          }
+
+          if (check.sameAsExample) {
+            const cfgValue = _.get(groupedCfg, key)
+            const exampleCfgValue = _.get(groupedExampleCfg, key)
+
+            if (!_.isEqual(cfgValue, exampleCfgValue)) {
+              printOutput('CONFIG VALUE MISMATCH', `config['${key}']:[${cfgValue}] !== exampleConfig['${key}']:[${exampleCfgValue}]`)
+              process.exit(1)
+            }
+          }
+        }
+      }
+    }
+
+    _.merge(this.conf, config)
 
     // e.g. util, coin or ext (i.e. derived from bfx-util-js)
     this.group = group
