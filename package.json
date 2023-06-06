@@ -12,9 +12,8 @@
     "bitfinex"
   ],
   "dependencies": {
-    "async": "^2.6.1",
-    "bfx-facs-interval": "git+https://github.com/bitfinexcom/bfx-facs-interval.git",
-    "lodash": "^4.17.10"
+    "async": "^3.2.1",
+    "lodash": "^4.17.21"
   },
   "engine": {
     "node": ">=8.0"

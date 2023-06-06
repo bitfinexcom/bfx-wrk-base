@@ -17,12 +17,6 @@ class Base extends EventEmitter {
   }
 
   init () {
-    if (this.conf) {
-      if (this.conf.skipCertCheck) {
-        process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
-      }
-    }
-
     this.status = {}
 
     this.conf.init = {
@@ -32,10 +26,6 @@ class Base extends EventEmitter {
     this.mem = {}
 
     this.loadStatus()
-
-    this.setInitFacs([
-      ['fac', 'bfx-facs-interval', '0', '0', {}, -10]
-    ])
   }
 
   getConf (env, type, path) {
