@@ -57,24 +57,18 @@ class Base extends EventEmitter {
 
     _.merge(this.conf, this.getConf(this.ctx.env, group, confPath))
 
-    // e.g. util, coin or ext (i.e. derived from bfx-util-js)
     this.group = group
   }
 
   cleanFacName (name) {
-    return name.replace('bfx-facs-', '')
+    return name.replace(/[a-z-]*facs-/, '')
   }
 
   facility (type, name, ns, opts) {
     let [Fmod, path] = [null, null]
 
-    if (name.indexOf('bfx-facs-') === 0) {
-      path = name
-      name = this.cleanFacName(name)
-    } else {
-      const rdir = 'facilities'
-      path = `${this.ctx.root}/${rdir}/${name}.js`
-    }
+    path = name
+    name = this.cleanFacName(name)
 
     try {
       Fmod = require(path)
