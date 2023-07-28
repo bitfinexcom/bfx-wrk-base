@@ -182,6 +182,7 @@ class Base extends EventEmitter {
 
     aseries.push(next => {
       let facs = this.conf.init.facilities
+
       facs = _.orderBy(facs, f => {
         return f[5] || 0
       })
@@ -210,10 +211,14 @@ class Base extends EventEmitter {
     })
 
     async.series(aseries, (err) => {
-      if (err) return cb(err)
+      if (err) {
+        console.trace()
+        throw err
+      }
 
       process.nextTick(() => {
         this.emit('started')
+        cb()
       })
     })
   }
