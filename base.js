@@ -80,7 +80,7 @@ class Base extends EventEmitter {
       return null
     }
 
-    const fac = (new Fmod(this, _.extend({ ns: ns }, opts), _.pick(this.ctx, ['env'])))
+    const fac = (new Fmod(this, _.extend({ ns }, opts), _.pick(this.ctx, ['env'])))
     fac.__name = name
 
     return fac
@@ -96,7 +96,24 @@ class Base extends EventEmitter {
     }
 
     if (_.isFunction(opts)) {
-      opts = opts()
+      try {
+        opts = opts()
+      } catch (error) {
+        const sep = '──────────────────────────────────────────────────────'
+        const feedbackMsg = [
+          `┌${sep}`,
+          `│ Error starting facility ${name}`,
+          `├${sep}`,
+          '│ The following error happened calling opts().',
+          `│ Error: ${error.message}.`,
+          '│ Possible issues and ways to solve:',
+          '│ - This facility depends on another facility and is not ready when calling opts().',
+          `│   Review this facility priority (current = ${prio}) when calling setInitFacs() on the 5th argument.`,
+          `└${sep}`
+        ]
+        console.error(['', ...feedbackMsg, ''].join('\n'))
+        throw error
+      }
     }
 
     opts.label = label
@@ -142,6 +159,16 @@ class Base extends EventEmitter {
     async.series(aseries, cb)
   }
 
+  /**
+   * @typedef {Array} Facilities
+   * @property {String} 0 - type of facility
+   * @property {String} 1 - name
+   * @property {String} 2 - namespace
+   * @property {String} 3 - label
+   * @property {Object|Function} 4 - options that will vary depending on the facility. It can be a function that will have the worker as context (this)
+   * @property {Number} 5 - priority
+   * @param {Array<Facilities>} facs
+   */
   setInitFacs (facs) {
     this.conf.init.facilities.push.apply(
       this.conf.init.facilities, facs
