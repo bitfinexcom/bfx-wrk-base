@@ -149,7 +149,7 @@ class Base extends EventEmitter {
     const aseries = []
 
     _.each(list, p => {
-      if (!p[5]) p[5] = 1
+      if (p[5] == null) p[5] = 1
 
       aseries.push(next => {
         this[dir].apply(this, p.concat([next]))
@@ -211,7 +211,7 @@ class Base extends EventEmitter {
       let facs = this.conf.init.facilities
 
       facs = _.orderBy(facs, f => {
-        return f[5] || 0
+        return f[5] ?? 0
       })
 
       this.facs('addFac', facs, (err) => {
@@ -275,7 +275,7 @@ class Base extends EventEmitter {
     aseries.push(next => {
       let facs = this.conf.init.facilities
       facs = _.orderBy(facs, f => {
-        return (f[5] || 0) * -1
+        return (f[5] ?? 0) * -1
       })
 
       this.facs('delFac', facs, next)
