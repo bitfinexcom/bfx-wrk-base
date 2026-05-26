@@ -6,6 +6,9 @@ const _ = require('lodash')
 const async = require('async')
 const EventEmitter = require('events')
 
+const LOCK_PROCESSING_STOP_CHECK_INTERVAL = 250
+const LOCK_PROCESSING_STOP_TIMEOUT = 10000
+
 class Base extends EventEmitter {
   constructor (conf, ctx) {
     super()
@@ -267,13 +270,28 @@ class Base extends EventEmitter {
     const aseries = []
 
     aseries.push(next => {
+      const started = Date.now()
+      const interval = this.stopLockProcessingInterval ||
+        this.conf.stopLockProcessingInterval ||
+        LOCK_PROCESSING_STOP_CHECK_INTERVAL
+      const timeout = this.stopLockProcessingTimeout ||
+        this.conf.stopLockProcessingTimeout ||
+        LOCK_PROCESSING_STOP_TIMEOUT
       const itv = setInterval(() => {
-        if (this.lockProcessing) {
+        if (this.lockProcessing && Date.now() - started < timeout) {
           return
         }
         clearInterval(itv)
+        if (this.lockProcessing) {
+          const msg = `stop(): lockProcessing remained set after ${timeout}ms, continuing shutdown`
+          if (this.logger && this.logger.warn) {
+            this.logger.warn(msg)
+          } else {
+            console.warn(msg)
+          }
+        }
         next()
-      }, 250)
+      }, interval)
     })
 
     aseries.push(next => {

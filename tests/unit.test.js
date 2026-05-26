@@ -122,3 +122,35 @@ test('config priority order', async (t) => {
     t.is(base.conf.source, 'env-json')
   })
 })
+
+test('stop continues when lockProcessing does not clear', async (t) => {
+  const dir = await setupDir(t)
+  const base = createBase(dir)
+  let stopCalled = false
+  let warning = null
+
+  base.init()
+  base.lockProcessing = true
+  base.stopLockProcessingInterval = 1
+  base.stopLockProcessingTimeout = 5
+  base.logger = {
+    warn: msg => {
+      warning = msg
+    }
+  }
+  base._stop = cb => {
+    stopCalled = true
+    cb()
+  }
+
+  await new Promise((resolve, reject) => {
+    base.stop(err => {
+      if (err) return reject(err)
+      resolve()
+    })
+  })
+
+  t.is(stopCalled, true)
+  t.is(base.active, 0)
+  t.ok(warning.includes('lockProcessing remained set'))
+})
