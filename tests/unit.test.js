@@ -131,8 +131,8 @@ test('stop continues when lockProcessing does not clear', async (t) => {
 
   base.init()
   base.lockProcessing = true
-  base.stopLockProcessingInterval = 1
-  base.stopLockProcessingTimeout = 5
+  base.conf.stopLockProcessingInterval = 1
+  base.conf.stopLockProcessingTimeout = 5
   base.logger = {
     warn: msg => {
       warning = msg

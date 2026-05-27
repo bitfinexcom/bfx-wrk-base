@@ -271,11 +271,9 @@ class Base extends EventEmitter {
 
     aseries.push(next => {
       const started = Date.now()
-      const interval = this.stopLockProcessingInterval ||
-        this.conf.stopLockProcessingInterval ||
+      const interval = this.conf.stopLockProcessingInterval ||
         LOCK_PROCESSING_STOP_CHECK_INTERVAL
-      const timeout = this.stopLockProcessingTimeout ||
-        this.conf.stopLockProcessingTimeout ||
+      const timeout = this.conf.stopLockProcessingTimeout ||
         LOCK_PROCESSING_STOP_TIMEOUT
       const itv = setInterval(() => {
         if (this.lockProcessing && Date.now() - started < timeout) {
