@@ -1,6 +1,6 @@
 {
   "name": "@bitfinex/bfx-wrk-base",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": false,
   "description": "Bitfinex base worker",
   "scripts": {
