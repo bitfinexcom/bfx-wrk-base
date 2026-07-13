@@ -225,7 +225,7 @@ class Base extends EventEmitter {
       this.facs('addFac', facs, (err) => {
         // crash early to avoid silent fails in facilities
         if (err) {
-          console.error(err.stack)
+          console.error(err)
           throw err
         }
         next()
@@ -247,7 +247,7 @@ class Base extends EventEmitter {
 
     async.series(aseries, (err) => {
       if (err) {
-        console.error(err.stack)
+        console.error(err)
         throw err
       }
 
