@@ -1,8 +1,5 @@
-// Node.js globals that ESLint does not already provide. ECMAScript
-// built-ins (Promise, Map, globalThis, ...) come from ecmaVersion, and
-// require/module/exports come from sourceType: 'commonjs', so neither is
-// listed here. Regenerate against a newer Node with the globals package if
-// you start using APIs newer than this list.
+'use strict'
+
 const nodeGlobals = Object.fromEntries(
   [
     '__dirname', '__filename', 'AbortController', 'AbortSignal', 'atob',
@@ -30,10 +27,6 @@ const nodeGlobals = Object.fromEntries(
 )
 
 // JavaScript Standard Style on ESLint 10, with no plugins.
-// CommonJS throughout: save this as eslint.config.js.
-// Derived from eslint-config-standard@17.1.0 (147 rules) plus 3 core rules
-// recovered to replace eslint-plugin-n. 150 rules, zero plugins.
-// Install: npm i -D eslint   (no other dependencies)
 
 module.exports = [
   {
@@ -47,10 +40,6 @@ module.exports = [
       reportUnusedDisableDirectives: true
     },
     rules: {
-      // ---------------------------------------------------------------
-      // Correctness and best practices (101 rules, all actively
-      // maintained in ESLint core)
-      // ---------------------------------------------------------------
       'accessor-pairs': ['error', { setWithoutGet: true, enforceForClassMembers: true }],
       'array-callback-return': ['error', { allowImplicit: false, checkForEach: false }],
       camelcase: ['error', { allow: ['^UNSAFE_'], properties: 'never', ignoreGlobals: true }],
@@ -153,11 +142,6 @@ module.exports = [
       'valid-typeof': ['error', { requireStringLiterals: true }],
       yoda: ['error', 'never'],
 
-      // ---------------------------------------------------------------
-      // Formatting (46 rules). These still ship and work in ESLint
-      // 10.10.0 but carry a deprecation flag; maintenance moved to
-      // @stylistic/eslint-plugin. See the note at the bottom of this file.
-      // ---------------------------------------------------------------
       'array-bracket-spacing': ['error', 'never'],
       'arrow-spacing': ['error', { before: true, after: true }],
       'block-spacing': ['error', 'always'],
@@ -205,11 +189,6 @@ module.exports = [
       'wrap-iife': ['error', 'any', { functionPrototypeMethods: true }],
       'yield-star-spacing': ['error', 'both'],
 
-      // ---------------------------------------------------------------
-      // Node rules recovered from core, replacing n/handle-callback-err,
-      // n/no-new-require and
-      // n/no-path-concat. All three are deprecated in core but working.
-      // ---------------------------------------------------------------
       'handle-callback-err': ['error', '^(err|error)$'],
       'no-new-require': 'error',
       'no-path-concat': 'error'
