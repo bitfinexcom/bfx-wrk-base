@@ -26,8 +26,6 @@ const nodeGlobals = Object.fromEntries(
   ].map(name => [name, 'readonly'])
 )
 
-// JavaScript Standard Style on ESLint 10, with no plugins.
-
 module.exports = [
   {
     files: ['**/*.js', '**/*.cjs'],
@@ -171,7 +169,7 @@ module.exports = [
       'object-curly-newline': ['error', { multiline: true, consistent: true }],
       'object-curly-spacing': ['error', 'always'],
       'object-property-newline': ['error', { allowMultiplePropertiesPerLine: true }],
-      'operator-linebreak': ['error', 'after', { overrides: { '?': 'before', ': ': 'before', '|>': 'before' } }],
+      'operator-linebreak': ['error', 'after', { overrides: { '?': 'before', ':': 'before', '|>': 'before' } }],
       'padded-blocks': ['error', { blocks: 'never', switches: 'never', classes: 'never' }],
       'quote-props': ['error', 'as-needed'],
       quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
@@ -183,7 +181,14 @@ module.exports = [
       'space-in-parens': ['error', 'never'],
       'space-infix-ops': 'error',
       'space-unary-ops': ['error', { words: true, nonwords: false }],
-      'spaced-comment': ['error', 'always', { line: { markers: ['*package', '!', '/', ', ', '='] }, block: { balanced: true, markers: ['*package', '!', ', ', ': ', ': : ', 'flow-include'], exceptions: ['*'] } }],
+      'spaced-comment': ['error', 'always', {
+        line: { markers: ['*package', '!', '/', ',', '='] },
+        block: {
+          balanced: true,
+          markers: ['*package', '!', ',', ':', '::', 'flow-include'],
+          exceptions: ['*']
+        }
+      }],
       'template-curly-spacing': ['error', 'never'],
       'template-tag-spacing': ['error', 'never'],
       'wrap-iife': ['error', 'any', { functionPrototypeMethods: true }],
