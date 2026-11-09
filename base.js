@@ -69,7 +69,7 @@ class Base extends EventEmitter {
   }
 
   cleanFacName (name) {
-    return name.replace(/[@a-z-/]*facs-/, '')
+    return name.replace(/^[@a-z-/]*facs-/, '')
   }
 
   facility (type, name, ns, opts) {
